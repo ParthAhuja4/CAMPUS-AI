@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from "react";
-import axios from "axios";
 import backgroundImage from "../Resources/background.png";
 import mode1 from "../Resources/Modes/1.png";
 import mode2 from "../Resources/Modes/2.png";
@@ -137,7 +136,7 @@ function Attendance() {
                 <p className="text-md">Major: {student.major}</p>
                 <p className="text-md">Year: {student.year}</p>
                 <p className="text-md">
-                  Attendance: {student.total_attendance}
+                  Attendance: {student.total_attendance * 0.5}
                 </p>
               </div>
             ))}
