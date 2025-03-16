@@ -26,7 +26,7 @@ encodeListKnown, studentIds = encodeListKnownWithIds
 print(f"✅ Loaded {len(encodeListKnown)} known face encodings.")
 
 # Time limit for marking absent (12 minutes)
-MAX_GAP_SECONDS = 120  
+MAX_GAP_SECONDS = 660  
 
 def mark_absentees():
     """Automatically marks students as absent if they have been inactive for more than 12 minutes."""
