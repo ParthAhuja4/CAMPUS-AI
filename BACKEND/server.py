@@ -41,7 +41,7 @@ def mark_absentees():
             if last_attendance_time:
                 last_time_obj = datetime.strptime(last_attendance_time, "%Y-%m-%d %H:%M:%S")
 
-                # If more than 12 minutes have passed, mark student as absent
+                # If more than 11 minutes have passed, mark student as absent
                 if (current_time - last_time_obj) > timedelta(seconds=MAX_GAP_SECONDS):
                     ref.child(student_id).update({
                         "total_attendance": 0,
