@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import backgroundImage from "../Resources/background.png";
+import backgroundImage from "../Resources/bg.avif";
 import mode1 from "../Resources/Modes/1.png";
 import mode2 from "../Resources/Modes/2.png";
 import mode3 from "../Resources/Modes/3.png";
