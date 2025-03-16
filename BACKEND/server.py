@@ -25,7 +25,7 @@ with open('EncodeFile.p', 'rb') as file:
 encodeListKnown, studentIds = encodeListKnownWithIds
 print(f"✅ Loaded {len(encodeListKnown)} known face encodings.")
 
-# Time limit for marking absent (12 minutes)
+# Time limit for marking absent (11 minutes)
 MAX_GAP_SECONDS = 660  
 
 def mark_absentees():
