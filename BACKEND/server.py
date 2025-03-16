@@ -29,7 +29,7 @@ print(f"✅ Loaded {len(encodeListKnown)} known face encodings.")
 MAX_GAP_SECONDS = 660  
 
 def mark_absentees():
-    """Automatically marks students as absent if they have been inactive for more than 12 minutes."""
+    """Automatically marks students as absent if they have been inactive for more than 11 minutes."""
     ref = db.reference('Students')
     students = ref.get()
     current_time = datetime.now()
