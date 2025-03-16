@@ -7,10 +7,10 @@ import pickle
 import firebase_admin
 from firebase_admin import credentials, db
 import base64
-from datetime import datetime
+from datetime import datetime, timedelta
 
 app = Flask(__name__)
-CORS(app, resources={r"/recognize": {"origins": "*"}})  # Ensure frontend can communicate
+CORS(app, resources={r"/recognize": {"origins": "*"}})
 
 # Initialize Firebase
 cred = credentials.Certificate("serviceAccountKey.json")
@@ -18,16 +18,36 @@ firebase_admin.initialize_app(cred, {
     'databaseURL': "https://facial-attendance-campusai-default-rtdb.firebaseio.com/"
 })
 
-# Load face encodings
+# Load known face encodings
 with open('EncodeFile.p', 'rb') as file:
     encodeListKnownWithIds = pickle.load(file)
 
 encodeListKnown, studentIds = encodeListKnownWithIds
 print(f"✅ Loaded {len(encodeListKnown)} known face encodings.")
 
-@app.route('/recognize', methods=['OPTIONS'])
-def handle_options():
-    return jsonify({"message": "CORS preflight request received"}), 200
+# Time limit for marking absent (12 minutes)
+MAX_GAP_SECONDS = 120  
+
+def mark_absentees():
+    """Automatically marks students as absent if they have been inactive for more than 12 minutes."""
+    ref = db.reference('Students')
+    students = ref.get()
+    current_time = datetime.now()
+
+    if students:
+        for student_id, student_info in students.items():
+            last_attendance_time = student_info.get('last_attendance_time')
+
+            if last_attendance_time:
+                last_time_obj = datetime.strptime(last_attendance_time, "%Y-%m-%d %H:%M:%S")
+
+                # If more than 12 minutes have passed, mark student as absent
+                if (current_time - last_time_obj) > timedelta(seconds=MAX_GAP_SECONDS):
+                    ref.child(student_id).update({
+                        "total_attendance": 0,
+                        "status": "absent"
+                    })
+                    print(f"❌ {student_info['name']} ({student_id}) automatically marked absent.")
 
 @app.route('/recognize', methods=['POST'])
 def recognize_faces():
@@ -45,6 +65,9 @@ def recognize_faces():
         if frame is None:
             return jsonify({'status': 'failed', 'message': 'Invalid image data'}), 400
 
+        # Mark students absent before processing new detections
+        mark_absentees()
+
         # Detect faces
         face_locations = face_recognition.face_locations(frame)
         face_encodings = face_recognition.face_encodings(frame, face_locations)
@@ -58,42 +81,37 @@ def recognize_faces():
 
             if matches[match_index]:  # If match found
                 student_id = studentIds[match_index]
-
                 ref = db.reference(f'Students/{student_id}')
                 student_info = ref.get()
 
                 if student_info:
-                    # Handle missing last_attendance_time
                     last_attendance_time = student_info.get('last_attendance_time', None)
-
                     if last_attendance_time:
                         last_time_obj = datetime.strptime(last_attendance_time, "%Y-%m-%d %H:%M:%S")
                     else:
-                        last_time_obj = datetime.now()  # First-time check-in
+                        last_time_obj = datetime.now()
 
                     current_time = datetime.now()
-
-                    # Calculate time spent in seconds
                     time_spent_seconds = (current_time - last_time_obj).total_seconds()
 
-                    # Ensure attendance updates in **exact 30-second increments**
-                    if time_spent_seconds >= 30:
-                        # Calculate number of 30-second intervals passed
-                        intervals = int(time_spent_seconds // 30)
-                        
-                        # Convert to minutes (each interval is 0.5 minutes)
-                        time_spent_minutes = intervals * 0.5
+                    # If student is already marked absent, do nothing
+                    if student_info.get('status') == 'absent':
+                        print(f"❌ {student_info['name']} ({student_id}) is already marked absent. No further attendance updates.")
+                        continue
 
+                    # Normal attendance update if within time limit
+                    if time_spent_seconds >= 30:
+                        intervals = max(1, int(time_spent_seconds // 30))
+                        time_spent_minutes = intervals * 0.5
                         total_time_spent = student_info['total_attendance'] + time_spent_minutes
 
-                        # Update database
                         ref.update({
-                            'total_attendance': round(total_time_spent, 2),  # Round to 2 decimal places
+                            'total_attendance': round(total_time_spent, 2),
                             'last_attendance_time': current_time.strftime("%Y-%m-%d %H:%M:%S")
                         })
-                        print(f"✅ Updated total attendance (minutes) for {student_info['name']} ({student_id}): {round(total_time_spent, 2)} min")
+                        print(f"✅ {student_info['name']} ({student_id}) attendance updated to {round(total_time_spent, 2)} minutes.")
 
-                        student_info['total_attendance'] = round(total_time_spent, 2)  # Update for response
+                        student_info['total_attendance'] = round(total_time_spent, 2)
 
                     recognized_students.append({
                         'id': student_id,
