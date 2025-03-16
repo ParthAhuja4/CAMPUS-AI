@@ -1,4 +1,4 @@
-﻿from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify
 from flask_cors import CORS
 import cv2
 import numpy as np
@@ -63,20 +63,37 @@ def recognize_faces():
                 student_info = ref.get()
 
                 if student_info:
-                    # Prevent multiple attendance markings within 30 seconds
-                    last_attendance_time = student_info.get('last_attendance_time', '2000-01-01 00:00:00')
-                    last_time_obj = datetime.strptime(last_attendance_time, "%Y-%m-%d %H:%M:%S")
-                    time_elapsed = (datetime.now() - last_time_obj).total_seconds()
+                    # Handle missing last_attendance_time
+                    last_attendance_time = student_info.get('last_attendance_time', None)
 
-                    if time_elapsed > 30:
-                        new_attendance = student_info['total_attendance'] + 1
+                    if last_attendance_time:
+                        last_time_obj = datetime.strptime(last_attendance_time, "%Y-%m-%d %H:%M:%S")
+                    else:
+                        last_time_obj = datetime.now()  # First-time check-in
+
+                    current_time = datetime.now()
+
+                    # Calculate time spent in seconds
+                    time_spent_seconds = (current_time - last_time_obj).total_seconds()
+
+                    # Ensure attendance updates in **exact 30-second increments**
+                    if time_spent_seconds >= 30:
+                        # Calculate number of 30-second intervals passed
+                        intervals = int(time_spent_seconds // 30)
+                        
+                        # Convert to minutes (each interval is 0.5 minutes)
+                        time_spent_minutes = intervals * 0.5
+
+                        total_time_spent = student_info['total_attendance'] + time_spent_minutes
+
+                        # Update database
                         ref.update({
-                            'total_attendance': new_attendance,
-                            'last_attendance_time': datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                            'total_attendance': round(total_time_spent, 2),  # Round to 2 decimal places
+                            'last_attendance_time': current_time.strftime("%Y-%m-%d %H:%M:%S")
                         })
-                        print(f"✅ Attendance updated for {student_info['name']} ({student_id})")
+                        print(f"✅ Updated total attendance (minutes) for {student_info['name']} ({student_id}): {round(total_time_spent, 2)} min")
 
-                        student_info['total_attendance'] = new_attendance  # Update for response
+                        student_info['total_attendance'] = round(total_time_spent, 2)  # Update for response
 
                     recognized_students.append({
                         'id': student_id,
