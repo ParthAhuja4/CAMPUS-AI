@@ -136,7 +136,7 @@ function Attendance() {
                 <p className="text-md">Major: {student.major}</p>
                 <p className="text-md">Year: {student.year}</p>
                 <p className="text-md">
-                  Attendance: {student.total_attendance * 0.5}
+                  Attendance: {student.total_attendance}
                 </p>
               </div>
             ))}
