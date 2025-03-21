@@ -56,7 +56,7 @@ function Geofencing() {
   ];
 
   const [userPosition, setUserPosition] = useState(null);
-  const [currentBlock, setCurrentBlock] = useState("Outside all blocks");
+  const [currentBlock, setCurrentBlock] = useState("Inside Block 2");
 
   // Function to check if the user is inside a polygon
   const isInsidePolygon = (point, polygon) => {
