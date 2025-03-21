@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 function Home() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen text-center">
-      <h1 className="text-4xl font-bold text-gray-900">Welcome to Campus AI</h1>
+      <h1 className="text-4xl font-bold text-gray-900">Welcome to Campus Pulse</h1>
       <p className="mt-4 text-gray-600 text-lg">
         Explore campus features from the sidebar
       </p>
