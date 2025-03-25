@@ -25,11 +25,11 @@ with open('EncodeFile.p', 'rb') as file:
 encodeListKnown, studentIds = encodeListKnownWithIds
 print(f"✅ Loaded {len(encodeListKnown)} known face encodings.")
 
-# Time limit for marking absent (11 minutes)
-MAX_GAP_SECONDS = 660  
+# Time limit for marking absent (3 minute)
+MAX_GAP_SECONDS = 180  
 
 def mark_absentees():
-    """Automatically marks students as absent if they have been inactive for more than 11 minutes."""
+    """Automatically marks students as absent if they have been inactive for more than 1 minute."""
     ref = db.reference('Students')
     students = ref.get()
     current_time = datetime.now()
@@ -41,7 +41,7 @@ def mark_absentees():
             if last_attendance_time:
                 last_time_obj = datetime.strptime(last_attendance_time, "%Y-%m-%d %H:%M:%S")
 
-                # If more than 11 minutes have passed, mark student as absent
+                # If more than 1 minute has passed, mark student as absent
                 if (current_time - last_time_obj) > timedelta(seconds=MAX_GAP_SECONDS):
                     ref.child(student_id).update({
                         "total_attendance": 0,

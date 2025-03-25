@@ -15,7 +15,7 @@ import {
 function Navbar() {
   return (
     <nav className="w-64 min-h-screen bg-gray-900 text-white p-5 flex flex-col">
-      <h1 className="text-2xl font-bold mb-6 text-center">Campus Pulse</h1>
+      <h1 className="text-2xl font-bold mb-6 text-center">CAMPUS PULSE</h1>
       <ul className="space-y-4">
         <li>
           <Link

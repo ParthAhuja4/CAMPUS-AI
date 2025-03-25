@@ -10,7 +10,7 @@ function Geofencing() {
       coordinates: [
         [28.679206706142132, 77.26100582675096], // Entry point
         [28.679197293515305, 77.26099509791594], // Exit point
-        [28.679210000000000, 77.26098500000000], // Additional point to form a polygon
+        [28.67921, 77.260985], // Additional point to form a polygon
       ],
     },
     {
@@ -18,45 +18,45 @@ function Geofencing() {
       coordinates: [
         [28.678495667350244, 77.26138725684625], // Entry point
         [28.678429778497495, 77.26108819056988], // Exit point
-        [28.678450000000000, 77.26120000000000],
+        [28.67845, 77.2612],
       ],
     },
     {
       name: "Canteen",
       coordinates: [
-        [28.678800, 77.261600],
-        [28.678850, 77.261650],
-        [28.678820, 77.261550],
+        [28.6788, 77.2616],
+        [28.67885, 77.26165],
+        [28.67882, 77.26155],
       ],
     },
     {
       name: "Main Ground",
       coordinates: [
-        [28.678300, 77.262000],
-        [28.678350, 77.262050],
-        [28.678320, 77.261950],
+        [28.6783, 77.262],
+        [28.67835, 77.26205],
+        [28.67832, 77.26195],
       ],
     },
     {
       name: "Football Ground",
       coordinates: [
-        [28.678000, 77.262500],
-        [28.678050, 77.262550],
-        [28.678020, 77.262450],
+        [28.678, 77.2625],
+        [28.67805, 77.26255],
+        [28.67802, 77.26245],
       ],
     },
     {
       name: "Parking Area",
       coordinates: [
-        [28.677800, 77.260900],
-        [28.677850, 77.260950],
-        [28.677820, 77.260850],
+        [28.6778, 77.2609],
+        [28.67785, 77.26095],
+        [28.67782, 77.26085],
       ],
     },
   ];
 
   const [userPosition, setUserPosition] = useState(null);
-  const [currentBlock, setCurrentBlock] = useState("Inside Block 2");
+  const [currentBlock, setCurrentBlock] = useState("Inside IT block");
 
   // Function to check if the user is inside a polygon
   const isInsidePolygon = (point, polygon) => {
@@ -69,8 +69,7 @@ function Geofencing() {
       let xj = polygon[j][0],
         yj = polygon[j][1];
       let intersect =
-        yi > y !== yj > y &&
-        x < ((xj - xi) * (y - yi)) / (yj - yi) + xi;
+        yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi;
       if (intersect) inside = !inside;
     }
     return inside;

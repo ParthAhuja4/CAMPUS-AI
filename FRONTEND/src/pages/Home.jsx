@@ -5,7 +5,9 @@ import { motion } from "framer-motion";
 function Home() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen text-center">
-      <h1 className="text-4xl font-bold text-gray-900">Welcome to Campus Pulse</h1>
+      <h1 className="text-4xl font-bold text-gray-900">
+        Welcome to CAMPUS PULSE
+      </h1>
       <p className="mt-4 text-gray-600 text-lg">
         Explore campus features from the sidebar
       </p>
@@ -29,7 +31,6 @@ function Home() {
           <h3 className="text-xl font-semibold">Campus Map</h3>
           <p className="text-gray-500 mt-2">Navigate the campus efficiently.</p>
         </motion.div>
-
       </div>
     </div>
   );
